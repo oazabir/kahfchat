@@ -265,11 +265,12 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ### Quick Dev Build (Single-ABI, Faster)
 
 ```bash
-# Detect emulator ABI
-adb shell getprop ro.product.cpu.abi
+# Fast dev install (single ABI, auto-detects emulator ABI on macOS)
+./tools/dev/install_dev.sh
 
-# Fast dev install (single ABI, no splits, fewer extra tasks)
-./gradlew :app:installGplayDebug -PdevBuild=true -PdevAbi=arm64-v8a
+# Optional: override ABI or pass extra Gradle args
+./tools/dev/install_dev.sh x86_64
+./tools/dev/install_dev.sh -- --stacktrace
 ```
 
 ### Troubleshooting

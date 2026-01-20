@@ -46,15 +46,32 @@ setupKover()
 android {
     namespace = "io.element.android.x"
 
+    val devBuild = project.findProperty("devBuild")?.toString()?.toBoolean() == true
+    val devAbiProperty = project.findProperty("devAbi")?.toString()
+    val supportedAbis = listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+    val hostOs = System.getProperty("os.name").lowercase(Locale.getDefault())
+    val hostArch = System.getProperty("os.arch").lowercase(Locale.getDefault())
+    val defaultDevAbi = when {
+        hostOs.contains("mac") && (hostArch.contains("aarch64") || hostArch.contains("arm")) -> "arm64-v8a"
+        hostOs.contains("mac") -> "x86_64"
+        else -> "x86_64"
+    }
+    val devAbi = devAbiProperty ?: defaultDevAbi
+    if (devBuild && devAbi !in supportedAbis) {
+        error("Invalid devAbi=$devAbi. Supported values: ${supportedAbis.joinToString(", ")}")
+    }
+    val effectiveAbis = if (devBuild) listOf(devAbi) else supportedAbis
+
     defaultConfig {
         applicationId = BuildTimeConfig.APPLICATION_ID
         targetSdk = Versions.TARGET_SDK
         versionCode = Versions.VERSION_CODE
         versionName = Versions.VERSION_NAME
 
-        // Keep abiFilter for the universalApk
+        // Keep abiFilter for the universalApk; narrow to a single ABI for dev builds.
         ndk {
-            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+            abiFilters.clear()
+            abiFilters += effectiveAbis
         }
 
         // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
@@ -64,14 +81,14 @@ android {
                 val buildingAppBundle = gradle.startParameter.taskNames.any { it.contains("bundle") }
 
                 // Enables building multiple APKs per ABI. This should be disabled when building an AAB.
-                isEnable = !buildingAppBundle
+                isEnable = !buildingAppBundle && !devBuild
 
                 // By default all ABIs are included, so use reset() and include to specify that we only
                 // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
                 // Resets the list of ABIs that Gradle should create APKs for to none.
                 reset()
 
-                if (!buildingAppBundle) {
+                if (!buildingAppBundle && !devBuild) {
                     // Specifies a list of ABIs that Gradle should create APKs for.
                     include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
                     // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
