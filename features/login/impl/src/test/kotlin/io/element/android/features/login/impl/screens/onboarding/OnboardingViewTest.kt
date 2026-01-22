@@ -44,6 +44,7 @@ class OnboardingViewTest {
             rule.setOnboardingView(
                 state = anOnBoardingState(
                     canCreateAccount = true,
+                    isAddingAccount = true,
                     eventSink = eventSink,
                 ),
                 onCreateAccount = callback,
@@ -99,18 +100,16 @@ class OnboardingViewTest {
     private fun `when can login with QR code - clicking on sign in manually calls the expected callback`(
         mustChooseAccountProvider: Boolean,
     ) {
-        val eventSink = EventsRecorder<OnBoardingEvents>(expectEvents = false)
-        ensureCalledOnceWithParam(mustChooseAccountProvider) { callback ->
-            rule.setOnboardingView(
-                state = anOnBoardingState(
-                    canLoginWithQrCode = true,
-                    mustChooseAccountProvider = mustChooseAccountProvider,
-                    eventSink = eventSink,
-                ),
-                onSignIn = callback,
-            )
-            rule.clickOn(R.string.screen_onboarding_sign_in_manually)
-        }
+        val eventSink = EventsRecorder<OnBoardingEvents>()
+        rule.setOnboardingView(
+            state = anOnBoardingState(
+                canLoginWithQrCode = true,
+                mustChooseAccountProvider = mustChooseAccountProvider,
+                eventSink = eventSink,
+            ),
+        )
+        rule.clickOn(R.string.screen_onboarding_sign_in_manually)
+        eventSink.assertSingle(OnBoardingEvents.OnSignIn("https://matrix.kahf.co.uk"))
     }
 
     @Test
@@ -130,19 +129,17 @@ class OnboardingViewTest {
     private fun `when cannot login with QR code or create account - clicking on continue calls the sign in callback`(
         mustChooseAccountProvider: Boolean,
     ) {
-        val eventSink = EventsRecorder<OnBoardingEvents>(expectEvents = false)
-        ensureCalledOnceWithParam(mustChooseAccountProvider) { callback ->
-            rule.setOnboardingView(
-                state = anOnBoardingState(
-                    canLoginWithQrCode = false,
-                    canCreateAccount = false,
-                    mustChooseAccountProvider = mustChooseAccountProvider,
-                    eventSink = eventSink,
-                ),
-                onSignIn = callback,
-            )
-            rule.clickOn(CommonStrings.action_continue)
-        }
+        val eventSink = EventsRecorder<OnBoardingEvents>()
+        rule.setOnboardingView(
+            state = anOnBoardingState(
+                canLoginWithQrCode = false,
+                canCreateAccount = false,
+                mustChooseAccountProvider = mustChooseAccountProvider,
+                eventSink = eventSink,
+            ),
+        )
+        rule.clickOn(CommonStrings.action_continue)
+        eventSink.assertSingle(OnBoardingEvents.OnSignIn("https://matrix.kahf.co.uk"))
     }
 
     @Test

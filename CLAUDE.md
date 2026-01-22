@@ -232,7 +232,7 @@ If Java 21 is not installed:
 brew install openjdk@21
 
 # Then set JAVA_HOME:
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 ```
 
 ## Building and Deploying to Android Emulator
@@ -253,7 +253,7 @@ adb devices
 
 ```bash
 # Set JAVA_HOME to Java 21
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 
 # Build and install the debug APK on connected emulator/device
 ./gradlew :app:installGplayDebug
@@ -277,7 +277,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 If you encounter a "Cannot find a Java installation" error:
 1. Ensure JDK 21 is installed: `brew install openjdk@21`
-2. Set JAVA_HOME: `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`
+2. Set JAVA_HOME: `export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home`
 3. Verify: `java -version` should show version 21
 
 If the build fails with configuration cache issues:

@@ -56,6 +56,7 @@ fun OnBoardingPage(
                     .fillMaxSize(),
                 painter = painterResource(id = R.drawable.onboarding_bg),
                 contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
                 contentDescription = null,
             )
         }

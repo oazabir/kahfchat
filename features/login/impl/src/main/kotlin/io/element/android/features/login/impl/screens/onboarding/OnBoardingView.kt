@@ -207,24 +207,13 @@ private fun OnBoardingContent(state: OnBoardingState) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = BiasAlignment(
                 horizontalBias = 0f,
-                verticalBias = -0.4f
-            )
-        ) {
-            ElementLogoAtom(
-                size = ElementLogoAtomSize.Large,
-                modifier = Modifier.padding(top = ElementLogoAtomSize.Large.shadowRadius / 2)
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = BiasAlignment(
-                horizontalBias = 0f,
-                verticalBias = 0.6f
+                verticalBias = -0.9f
             )
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
                 horizontalAlignment = CenterHorizontally,
             ) {
                 Text(
@@ -235,7 +224,7 @@ private fun OnBoardingContent(state: OnBoardingState) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(id = R.string.screen_onboarding_welcome_message, state.productionApplicationName),
+                    text = stringResource(id = R.string.screen_onboarding_welcome_subtitle),
                     color = ElementTheme.colors.textSecondary,
                     style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = 17.sp),
                     textAlign = TextAlign.Center
@@ -271,6 +260,7 @@ private fun OnBoardingButtons(
     onCreateAccount: () -> Unit,
     onReportProblem: () -> Unit,
 ) {
+    val defaultHomeserverUrl = "https://matrix.kahf.co.uk"
     val isLoading by remember(state.loginMode) {
         derivedStateOf {
             state.loginMode is AsyncData.Loading
@@ -307,9 +297,11 @@ private fun OnBoardingButtons(
         if (defaultAccountProvider == null) {
             Button(
                 text = stringResource(id = signInButtonStringRes),
+                showProgress = isLoading,
                 onClick = {
-                    onSignIn(state.mustChooseAccountProvider)
+                    state.eventSink(OnBoardingEvents.OnSignIn(defaultHomeserverUrl))
                 },
+                enabled = state.submitEnabled || isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(TestTags.onBoardingSignIn)
@@ -326,7 +318,7 @@ private fun OnBoardingButtons(
                     .fillMaxWidth()
             )
         }
-        if (state.canCreateAccount) {
+        if (state.isAddingAccount && state.canCreateAccount) {
             TextButton(
                 text = stringResource(id = R.string.screen_onboarding_sign_up),
                 onClick = onCreateAccount,
