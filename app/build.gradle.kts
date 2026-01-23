@@ -44,7 +44,7 @@ plugins {
 setupKover()
 
 android {
-    namespace = "io.element.android.x"
+    namespace = "io.kahf.chat"
 
     val devBuild = project.findProperty("devBuild")?.toString()?.toBoolean() == true
     val devAbiProperty = project.findProperty("devAbi")?.toString()
@@ -125,7 +125,7 @@ android {
     logger.warnInBox("Building ${defaultConfig.applicationId} ($baseAppName) [$buildType]")
 
     buildTypes {
-        val oidcRedirectSchemeBase = BuildTimeConfig.METADATA_HOST_REVERSED ?: "io.element.android"
+        val oidcRedirectSchemeBase = BuildTimeConfig.METADATA_HOST_REVERSED ?: "io.kahf.chat"
         getByName("debug") {
             resValue("string", "app_name", "$baseAppName dbg")
             resValue(
